@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Structs
+﻿namespace Structs
 {
     public struct Position
     {
@@ -11,6 +9,22 @@ namespace Structs
         {
             this.x = x;
             this.y = y;
+        }
+    }
+
+    public struct TileInfo
+    {
+        public int tileID;
+        public char tileChar;
+        public ConsoleColor tileColor;
+        public bool tileMovable;
+
+        public TileInfo(int tileID, char tileChar, ConsoleColor tileColor, bool tileMovable)
+        {
+            this.tileID = tileID;
+            this.tileChar = tileChar;
+            this.tileColor = tileColor;
+            this.tileMovable = tileMovable;
         }
     }
 }

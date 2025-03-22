@@ -1,15 +1,20 @@
 ﻿using RoguelikeConsoleGame;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
     public class Shop
     {
         private Dictionary<string, (int cost, Action<Player> effect)> items = new Dictionary<string, (int cost, Action<Player> effect)>();
-        private Player player;
-        public Shop(Player player)
+
+        public Shop()
         {
             InitializeItems();
-            this.player = player;
         }
 
         private void InitializeItems()
@@ -24,7 +29,7 @@ namespace ConsoleApp1
             items["복권"] = (150, (player) =>
             {
                 int gold = new Random().Next(0, 301);
-                player.HaveMoney += gold;
+                player.AddMoney(gold);
                 Console.WriteLine($"복권을 구매하여 {gold}골드를 획득했습니다!");
             }
             );
@@ -38,10 +43,8 @@ namespace ConsoleApp1
 
             items["강화의 돌(1회 구매가능)"] = (500, (player) =>
             {
-                player.Inventory.AddItem("강화의 돌(1");
                 player.AttackPower += 3;
-                player.usedStone = true;
-
+                
             }
             );
         }
@@ -74,12 +77,12 @@ namespace ConsoleApp1
                     }
                     else
                     {
-                        string selectedItem = GetItemNameByIndex(choice,player);
+                        string selectedItem = GetItemNameByIndex(choice);
                         if (items.TryGetValue(selectedItem, out var itemInfo))
                         {
                             if (player.HaveMoney >= itemInfo.cost)
                             {
-                                player.HaveMoney -= itemInfo.cost;
+                                player.AddMoney(-itemInfo.cost);
                                 itemInfo.effect(player);
                             }
                             else
@@ -98,22 +101,18 @@ namespace ConsoleApp1
             }
         }
 
-        private string GetItemNameByIndex(int index,Player player)
+        private string GetItemNameByIndex(int index)
         {
             int count = 1;
             foreach (var item in items)
             {
-                if (item.Key != "강화의 돌(1회구매가능)" || !player.usedStone)
+                if (count == index)
                 {
-                    if (count == index)
-                    {
-                        return item.Key;
-                    }
-                    count++;
+                    return item.Key;
                 }
-                return null;
+                count++;
             }
-             return null;
+            return null;
         }
     }
 }
