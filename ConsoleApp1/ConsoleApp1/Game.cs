@@ -114,9 +114,7 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     PrintBattle(new Position(0, 1));
                     break;
-                case ViewField.Inn:
-                    PrintInn(new Position(0, 0));
-                    break;
+                
             }
         }
 
@@ -156,9 +154,7 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     InputBattle(inputKey);
                     break;
-                case ViewField.Inn:
-                    InputInn(inputKey);
-                    break;
+                
             }
         }
         // 마지막 업데이트 (모든 처리의 마지막 후처리)
@@ -244,14 +240,7 @@ namespace RoguelikeConsoleGame
             Console.WriteLine("1. 공격");
             Console.WriteLine("2. 도망가기");
         }
-        private void PrintInn(Position pos)
-        {
-            Console.SetCursorPosition(pos.x, pos.y);
-            Console.WriteLine("===== 여관 =====");
-            Console.WriteLine("1. 휴식 (HP 회복)");
-            Console.WriteLine("2. 로비로 돌아가기");
-            Console.Write("메뉴를 선택하세요: ");
-        }
+       
 
         // ETC
         private void DrawMap(Position pos)
@@ -314,10 +303,8 @@ namespace RoguelikeConsoleGame
                 case ConsoleKey.D2:
                     viewField = ViewField.Field;
                     break;
+                
                 case ConsoleKey.D3:
-                    viewField = ViewField.Inn;
-                    break;
-                case ConsoleKey.D4:
                     isGameOver = true;
                     break;
             }
@@ -375,19 +362,7 @@ namespace RoguelikeConsoleGame
                     break;
             }
         }
-        private void InputInn(ConsoleKey inputKey)
-        {
-            switch (inputKey)
-            {
-                case ConsoleKey.D1:
-                    player.HP = 100; // HP를 최대로 회복
-                    Console.WriteLine("플레이어의 HP가 완전히 회복되었습니다!");
-                    break;
-                case ConsoleKey.D2:
-                    viewField = ViewField.Lobby;
-                    break;
-            }
-        }
+        
 
         // ETC
         #endregion
@@ -402,7 +377,7 @@ namespace RoguelikeConsoleGame
                 player = new Warrior();
             }
 
-            Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HP}, 공격력: {player.AttackPower}");
+            Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HaveMoney}, 공격력: {player.AttackPower}");
             viewField = ViewField.Field;
         }
         private void ProcessBattle()
@@ -437,7 +412,7 @@ namespace RoguelikeConsoleGame
                     break;
             }
 
-            if (player.HP <= 0)
+            if (player.HaveMoney <= 0)
             {
                 battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
                 isGameOver = true;
@@ -456,8 +431,8 @@ namespace RoguelikeConsoleGame
                 return;
             }
 
-            player.HP -= damage;
-            battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HP}");
+            player.HaveMoney -= damage;
+            battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
         }
         #endregion
     }
