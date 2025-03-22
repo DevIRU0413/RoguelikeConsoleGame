@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using ConsoleApp1;
+using Enums;
 using Structs;
-using ConsoleApp1;
 
 namespace RoguelikeConsoleGame
 {
@@ -8,7 +8,7 @@ namespace RoguelikeConsoleGame
     {
         private ViewField viewField = ViewField.Title;
         private bool isGameOver = false;
-        private Loger battleLoger = null;
+        private Logger battleLoger = null;
 
         private Player player;
         private Monster monster;
@@ -81,7 +81,7 @@ namespace RoguelikeConsoleGame
             };
 
             MapManager.Singleton.Init(tiles, mapNum);
-            battleLoger = new Loger(19);
+            battleLoger = new Logger(19);
             shop = new Shop();
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
             // battleAction = BattleAction.None;
@@ -129,14 +129,16 @@ namespace RoguelikeConsoleGame
         // Update 처리
         private void Update(ConsoleKey inputKey, ref ViewField view)
         {
+            ViewField currentView = view;
             InputUpdate(inputKey, ref view);
-            LateUpdate(inputKey, ref view);
+            LateUpdate(inputKey, currentView);
+
         }
         // 입력 처리(입력 키 처리 및 씬변화 처리)
         private void InputUpdate(ConsoleKey inputKey, ref ViewField view)
         {
             // 키 처리
-            switch (viewField)
+            switch (view)
             {
                 case ViewField.Title:
                     InputTitle(inputKey);
@@ -160,10 +162,10 @@ namespace RoguelikeConsoleGame
             }
         }
         // 마지막 업데이트 (모든 처리의 마지막 후처리)
-        private void LateUpdate(ConsoleKey inputKey, ref ViewField view)
+        private void LateUpdate(ConsoleKey inputKey, ViewField view)
         {
             // 후 처리
-            switch (viewField)
+            switch (view)
             {
                 case ViewField.Title:
                     break;
@@ -177,7 +179,7 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     ProcessBattle();
                     break;
-                    //마을에 들어갈때 와이번 킬카운트 초기화
+                //마을에 들어갈때 와이번 킬카운트 초기화
                 case ViewField.Town:
                     wyvernKillCount = 0;
                     break;
@@ -367,7 +369,6 @@ namespace RoguelikeConsoleGame
             }
         }
 
-
         // ETC
         #endregion
 
@@ -382,7 +383,7 @@ namespace RoguelikeConsoleGame
             }
 
             Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HaveMoney}, 공격력: {player.AttackPower}");
-            viewField = ViewField.Field;
+            viewField = ViewField.Lobby;
         }
         private void ProcessBattle()
         {
@@ -418,28 +419,24 @@ namespace RoguelikeConsoleGame
                                 battleLoger.AddLog("멀리서 표효 소리가 들려온다.");
                             }
                         }
-                            monster = null;
-                          
-                        }
-                        break;
-                case BattleAction.RunAway:
-                            Console.WriteLine("플레이어가 도망쳤습니다!");
-                            viewField = ViewField.Field;
-                            break;
-                        default:
-                            Console.WriteLine("잘못된 입력입니다.");
-                            break;
-                        }
-
-                        if (player.HaveMoney <= 0)
-                        {
-                            battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
-                            isGameOver = true;
-                        }
+                        monster = null;
                     }
-            
-        
-            
+                    break;
+                case BattleAction.RunAway:
+                    Console.WriteLine("플레이어가 도망쳤습니다!");
+                    viewField = ViewField.Lobby;
+                    break;
+                default:
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+            }
+
+            if (player.HaveMoney <= 0)
+            {
+                battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
+                isGameOver = true;
+            }
+        }
 
         // ETC
         private void MonsterAttack()
