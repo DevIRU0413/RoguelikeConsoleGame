@@ -64,6 +64,7 @@ public class Archer : Player
         }
     }
 }
+
 public class Rogue : Player
 {
     public Rogue() : base("도적", 75, 12, 10) { }
