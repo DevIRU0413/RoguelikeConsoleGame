@@ -29,7 +29,7 @@ namespace ConsoleApp1
             items["복권"] = (150, (player) =>
             {
                 int gold = new Random().Next(0, 301);
-                player.HaveMoney += gold;
+                player.AddMoney(gold);
                 Console.WriteLine($"복권을 구매하여 {gold}골드를 획득했습니다!");
             }
             );
@@ -43,8 +43,7 @@ namespace ConsoleApp1
 
             items["강화의 돌"] = (500, (player) =>
             {
-                player.AttackPower += 3;
-                
+                player.AddAttackPower(3);
             }
             );
         }
@@ -79,7 +78,7 @@ namespace ConsoleApp1
                         {
                             if (player.HaveMoney >= itemInfo.cost)
                             {
-                                player.HaveMoney -= itemInfo.cost;
+                                player.AddMoney(-itemInfo.cost);
                                 itemInfo.effect(player);
                             }
                             else
