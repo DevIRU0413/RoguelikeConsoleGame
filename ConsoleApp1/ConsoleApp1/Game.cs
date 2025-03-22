@@ -177,6 +177,10 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     ProcessBattle();
                     break;
+                    //마을에 들어갈때 와이번 킬카운트 초기화
+                case ViewField.Town:
+                    wyvernKillCount = 0;
+                    break;
             }
         }
 
@@ -398,26 +402,44 @@ namespace RoguelikeConsoleGame
                     else
                     {
                         battleLoger.AddLog($"{monster.Name}을(를) 처치했습니다!");
-                        if (monster.Name == "와이번") wyvernKillCount++;
-                        monster = null;
+                        if (monster.Name == "와이번")
+                        {
+                            wyvernKillCount++;
+                            if (wyvernKillCount == 3)
+                            {
+                                battleLoger.AddLog("음산한 기운이 감싸든다");
+                            }
+                            else if (wyvernKillCount == 4)
+                            {
+                                battleLoger.AddLog("싸늘한 기운이 감싸온다.");
+                            }
+                            else if (wyvernKillCount == 5)
+                            {
+                                battleLoger.AddLog("멀리서 표효 소리가 들려온다.");
+                            }
+                        }
+                            monster = null;
+                          
+                        }
                         break;
-                    }
-                    break;
                 case BattleAction.RunAway:
-                    Console.WriteLine("플레이어가 도망쳤습니다!");
-                    viewField = ViewField.Field;
-                    break;
-                default:
-                    Console.WriteLine("잘못된 입력입니다.");
-                    break;
-            }
+                            Console.WriteLine("플레이어가 도망쳤습니다!");
+                            viewField = ViewField.Field;
+                            break;
+                        default:
+                            Console.WriteLine("잘못된 입력입니다.");
+                            break;
+                        }
 
-            if (player.HaveMoney <= 0)
-            {
-                battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
-                isGameOver = true;
-            }
-        }
+                        if (player.HaveMoney <= 0)
+                        {
+                            battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
+                            isGameOver = true;
+                        }
+                    }
+            
+        
+            
 
         // ETC
         private void MonsterAttack()
@@ -435,7 +457,7 @@ namespace RoguelikeConsoleGame
             battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
 
             if (player.HaveMoney <= 0)
-            {
+            {   // 기회창출의 돌 로직 
                 if (player.HasStone)
                 {
                     player.HaveMoney += 100;
