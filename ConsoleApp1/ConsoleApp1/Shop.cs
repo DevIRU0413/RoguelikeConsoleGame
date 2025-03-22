@@ -21,8 +21,8 @@ namespace ConsoleApp1
         {
             items["HP 포션"] = (50, (player) =>
             {
-                player.HP += 50;
-                
+                player.Inventory.AddItem("HP 포션");
+
             }
             );
 
@@ -36,14 +36,16 @@ namespace ConsoleApp1
 
             items["기회창출의 돌"] = (1000, (player) =>
             {
-                
+                player.Inventory.AddItem("기회창출의 돌");
                 // 부활 로직 필요 
             }
             );
 
-            items["강화의 돌"] = (500, (player) =>
+            items["강화의 돌(1회 구매가능)"] = (500, (player) =>
             {
+                player.Inventory.AddItem("강화의 돌");
                 player.AttackPower += 3;
+                player.usedStone = true;
                 
             }
             );
@@ -59,8 +61,11 @@ namespace ConsoleApp1
                 int index = 1;
                 foreach (var item in items)
                 {
-                    Console.WriteLine($"{index}. {item.Key} - {item.Value.cost}골드");
-                    index++;
+                    if (item.Key != "강화의 돌(1회구매가능)" || !player.usedStone)
+                    {
+                        Console.WriteLine($"{index}. {item.Key} - {item.Value.cost}골드");
+                        index++;
+                    }
                 }
                 Console.WriteLine($"{index}. 나가기");
                 Console.Write("선택: ");

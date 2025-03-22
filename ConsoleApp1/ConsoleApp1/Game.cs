@@ -1,4 +1,5 @@
-﻿using Enums;
+﻿using ConsoleApp1;
+using Enums;
 using Structs;
 
 namespace RoguelikeConsoleGame
@@ -13,6 +14,12 @@ namespace RoguelikeConsoleGame
         private Player player;
         private Monster monster;
         private int wyvernKillCount = 0;
+        private Shop shop;
+
+        public Game()
+        {
+            shop = new Shop(player);
+        }
         // 플레이어 쪽에 넣기
         // private int playerMoney = 0; // 플레이어의 돈 정보 
 
