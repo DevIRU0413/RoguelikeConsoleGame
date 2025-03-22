@@ -11,48 +11,45 @@ public class MapManager
         get
         {
             if (initialized == null)
-            {
                 initialized = new MapManager();
-            }
             return initialized;
         }
     }
 
     // Tiles Data
-    TileInfo[] tileInfos;
+    public TileInfo[] TileInfos { get; private set; }
 
     // Tile num Array
-    int[,] mapTiles;
+    public int[,] MapTiles { get; private set; }
 
     public void Init(TileInfo[] tileInfos, int[,] mapTileNums)
     {
-        SetTileInfoDatas(tileInfos);
-        SetMapData(mapTileNums);
+        TileInfos = tileInfos;
+        MapTiles = mapTileNums;
     }
 
-    // 각 번호에 대한 타일 정보 받기
-    private void SetTileInfoDatas(TileInfo[] tileInfos)
+    public bool IsInMap(Position pos)
     {
-        this.tileInfos = tileInfos;
+        return (pos.x >= 0 && pos.y >= 0
+            && pos.x < MapTiles.GetLength(1) && pos.y < MapTiles.GetLength(0));
     }
-    // 타일 숫자로된 배일 받기
-    private void SetMapData(int[,] mapTileNums)
+    public bool IsPosMovable(Position pos)
     {
-        mapTiles = mapTileNums;
+        return TileInfos[MapTiles[pos.y, pos.x]].tileMovable;
     }
 
     // 맵 특수문자 출력(그림용)
     public void DrawMapTile(Position pos)
     {
         Console.SetCursorPosition(pos.x, pos.y);
-        for (int y = 0; y < mapTiles.GetLength(0); y++)
+        for (int y = 0; y < MapTiles.GetLength(0); y++)
         {
-            for (int x = 0; x < mapTiles.GetLength(1); x++)
+            for (int x = 0; x < MapTiles.GetLength(1); x++)
             {
-                int tileNum = mapTiles[y,x];
+                int tileNum = MapTiles[y,x];
 
-                Console.ForegroundColor = tileInfos[tileNum].tileColor;
-                Console.Write($" {tileInfos[tileNum].tileChar}");
+                Console.ForegroundColor = TileInfos[tileNum].tileColor;
+                Console.Write($" {TileInfos[tileNum].tileChar}");
                 Console.ResetColor();
             }
             Console.WriteLine();
@@ -62,11 +59,11 @@ public class MapManager
     public void PrintMapTileNum(Position pos)
     {
         Console.SetCursorPosition(pos.x, pos.y);
-        for (int y = 0; y < mapTiles.GetLength(0); y++)
+        for (int y = 0; y < MapTiles.GetLength(0); y++)
         {
-            for (int x = 0; x < mapTiles.GetLength(1); x++)
+            for (int x = 0; x < MapTiles.GetLength(1); x++)
             {
-                int tileNum = mapTiles[y,x];
+                int tileNum = MapTiles[y,x];
                 Console.Write($" {tileNum}");
             }
             Console.WriteLine();
