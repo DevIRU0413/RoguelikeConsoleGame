@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 namespace ConsoleApp1
 {
-    public class Loger
+    public class Logger
     {
         private string[] logs;
         private int count;
 
-        public Loger(int size)
+        public Logger(int size)
         {
             logs = new string[size];
             count = 0;
@@ -52,7 +52,7 @@ namespace ConsoleApp1
             if (logs == null) return;
 
             Console.SetCursorPosition(pos.x, pos.y);
-            Console.WriteLine("*===============LOGER===============*");
+            Console.WriteLine("*===============LOGGER===============*");
             for (int i = 0; i < logs.Length; i++)
             {
                 Console.SetCursorPosition(pos.x, pos.y + 1 + i);
@@ -62,7 +62,7 @@ namespace ConsoleApp1
                     Console.WriteLine($"*{logs[i]}");
             }
             Console.SetCursorPosition(pos.x, pos.y + 1 + logs.Length);
-            Console.WriteLine("*===================================*");
+            Console.WriteLine("*====================================*");
         }
     }
 }
