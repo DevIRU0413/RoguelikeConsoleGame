@@ -1,20 +1,15 @@
 ﻿using RoguelikeConsoleGame;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
     public class Shop
     {
         private Dictionary<string, (int cost, Action<Player> effect)> items = new Dictionary<string, (int cost, Action<Player> effect)>();
-
-        public Shop()
+        private Player player;
+        public Shop(Player player)
         {
             InitializeItems();
+            this.player = player;
         }
 
         private void InitializeItems()
@@ -43,10 +38,10 @@ namespace ConsoleApp1
 
             items["강화의 돌(1회 구매가능)"] = (500, (player) =>
             {
-                player.Inventory.AddItem("강화의 돌");
+                player.Inventory.AddItem("강화의 돌(1");
                 player.AttackPower += 3;
                 player.usedStone = true;
-                
+
             }
             );
         }
@@ -79,7 +74,7 @@ namespace ConsoleApp1
                     }
                     else
                     {
-                        string selectedItem = GetItemNameByIndex(choice);
+                        string selectedItem = GetItemNameByIndex(choice,player);
                         if (items.TryGetValue(selectedItem, out var itemInfo))
                         {
                             if (player.HaveMoney >= itemInfo.cost)
@@ -103,18 +98,22 @@ namespace ConsoleApp1
             }
         }
 
-        private string GetItemNameByIndex(int index)
+        private string GetItemNameByIndex(int index,Player player)
         {
             int count = 1;
             foreach (var item in items)
             {
-                if (count == index)
+                if (item.Key != "강화의 돌(1회구매가능)" || !player.usedStone)
                 {
-                    return item.Key;
+                    if (count == index)
+                    {
+                        return item.Key;
+                    }
+                    count++;
                 }
-                count++;
+                return null;
             }
-            return null;
+             return null;
         }
     }
 }
