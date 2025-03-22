@@ -1,5 +1,6 @@
 ﻿using Enums;
 using Structs;
+using ConsoleApp1;
 
 namespace RoguelikeConsoleGame
 {
@@ -7,6 +8,7 @@ namespace RoguelikeConsoleGame
     {
         private ViewField viewField = ViewField.Title;
         private bool isGameOver = false;
+        private Loger battleLoger = null;
 
         private Player player;
         private Monster monster;
@@ -35,19 +37,30 @@ namespace RoguelikeConsoleGame
         // 값 초기화 관련 처리
         private void Init()
         {
-            int[,] mapNum = new int[11, 11]
+            int[,] mapNum = new int[21, 21]
             {
-                { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, }, // 0
-                { 2, 4, 5, 5, 5, 1, 2, 5, 5, 4, 2, }, // 1
-                { 2, 2, 2, 2, 1, 1, 2, 5, 2, 2, 2, }, // 2
-                { 2, 1, 1, 1, 1, 1, 2, 5, 2, 1, 2, }, // 3
-                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 4
-                { 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 5
-                { 2, 4, 5, 1, 1, 1, 1, 1, 1, 1, 2, }, // 6
-                { 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 7
-                { 2, 1, 1, 1, 1, 1, 1, 1, 5, 2, 2, }, // 8
-                { 2, 1, 1, 1, 1, 5, 1, 2, 5, 4, 2, }, // 9
-                { 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, }, // 10
+                //0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
+                { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, }, // 0
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 2
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 3
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 4
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 5
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 6
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 7
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, }, // 0
             };
 
             TileInfo errorTile = new TileInfo((int)Tile.Floor, 'ⓧ', ConsoleColor.Red, false);
@@ -67,6 +80,7 @@ namespace RoguelikeConsoleGame
             };
 
             MapManager.Singleton.Init(tiles, mapNum);
+            battleLoger = new Loger(19);
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
             // battleAction = BattleAction.None;
         }
@@ -98,7 +112,7 @@ namespace RoguelikeConsoleGame
                     PrintField(new Position(0, 0));
                     break;
                 case ViewField.Battle:
-                    PrintBattle(new Position(0, 0));
+                    PrintBattle(new Position(0, 1));
                     break;
                 case ViewField.Inn:
                     PrintInn(new Position(0, 0));
@@ -221,8 +235,8 @@ namespace RoguelikeConsoleGame
         private void PrintBattle(Position pos)
         {
             DrawMap(pos);
-            DrawPlayerInfo();
-            DrawLogs();
+            DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y-1));
+            DrawLogs(new Position(44, pos.y));
 
             Console.WriteLine("\n행동을 선택하세요:");
             Console.WriteLine("1. 공격");
@@ -242,15 +256,14 @@ namespace RoguelikeConsoleGame
         {
             MapManager.Singleton.DrawMapTile(pos);
         }
-        private void DrawPlayerInfo()
+        private void DrawPlayerInfo(Position pos)
         {
-            Console.SetCursorPosition(Console.WindowWidth - 20, 0);
+            Console.SetCursorPosition(pos.x, pos.y);
             Console.WriteLine($"PlayerGold: {player.HaveMoney}");
         }
-        private void DrawLogs()
+        private void DrawLogs(Position pos)
         {
-            Console.SetCursorPosition(0, Console.WindowHeight - 5);
-            Console.WriteLine("로그 출력하면 될것같아요.");
+            battleLoger.DrawLoger(pos);
         }
         #endregion
 
@@ -403,7 +416,7 @@ namespace RoguelikeConsoleGame
                     }
                     else
                     {
-                        Console.WriteLine($"{monster.Name}을(를) 처치했습니다!");
+                        battleLoger.AddLog($"{monster.Name}을(를) 처치했습니다!");
                         if (monster.Name == "와이번") wyvernKillCount++;
                         monster = null;
                         break;
@@ -420,7 +433,7 @@ namespace RoguelikeConsoleGame
 
             if (player.HP <= 0)
             {
-                Console.WriteLine("플레이어가 사망했습니다. 게임 오버!");
+                battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
                 isGameOver = true;
             }
         }
@@ -433,12 +446,12 @@ namespace RoguelikeConsoleGame
             // 전사의 자동 방어 시스템 적용유무는 모르겠음 머쓱 
             if (player is Warrior warrior && warrior.BlockAttack())
             {
-                Console.WriteLine($"전사가 몬스터의 공격을 막았습니다!");
+                battleLoger.AddLog($"전사가 몬스터의 공격을 막았습니다!");
                 return;
             }
 
             player.HP -= damage;
-            Console.WriteLine($"{monster.Name}이(가) 플레이어를 공격하여 {damage}의 피해를 입혔습니다! 남은 HP: {player.HP}");
+            battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HP}");
         }
         #endregion
     }
