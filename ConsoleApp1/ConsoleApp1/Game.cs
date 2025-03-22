@@ -14,6 +14,7 @@ namespace RoguelikeConsoleGame
         private Monster monster;
         private BattleAction battleAction;
         private int wyvernKillCount = 0;
+        private Shop shop;
 
         #region Process
         public void Process()
@@ -81,6 +82,7 @@ namespace RoguelikeConsoleGame
 
             MapManager.Singleton.Init(tiles, mapNum);
             battleLoger = new Loger(19);
+            shop = new Shop();
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
             // battleAction = BattleAction.None;
         }
@@ -206,8 +208,7 @@ namespace RoguelikeConsoleGame
             Console.WriteLine("===== 로비 =====");
             Console.WriteLine("1. 마을로 이동");
             Console.WriteLine("2. 필드로 이동");
-            Console.WriteLine("3. 여관으로 이동");
-            Console.WriteLine("4. 게임 종료");
+            Console.WriteLine("3. 게임 종료");
             Console.Write("메뉴를 선택하세요: ");
         }
         private void PrintTown(Position pos)
@@ -314,8 +315,7 @@ namespace RoguelikeConsoleGame
             switch (inputKey)
             {
                 case ConsoleKey.D1:
-                    // 상점에서 아이템 구매 로직 추가
-                    Console.WriteLine("아이템 구매 기능 여기에 넣으면 될듯 >? ");
+                    shop.OpenShop(player);
                     break;
                 case ConsoleKey.D2:
                     // 퀘스트 수락 로직 추가

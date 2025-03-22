@@ -3,27 +3,57 @@
 public abstract class Player
 {
     public string Job { get; }
-    
+
     public int AttackPower { get; set; }
     public int HaveMoney { get; set; }
     public Inventory Inventory { get; set; }
     public bool usedStone { get; set; }
-    
+
     public bool HasStone { get; set; }
+    public Mercenary Mercenary { get; set; }
     protected Random random = new Random();
 
     protected Player(string job, int attackPower, int haveMoney)
     {
         Job = job;
-        
+
         AttackPower = attackPower;
         HaveMoney = haveMoney;
         Inventory = new Inventory();
         usedStone = false;
         HasStone = false;
+        Mercenary = null;
     }
 
     public abstract void Attack(Monster monster);
+
+    public void HireMercenary()
+    {
+        Console.WriteLine("용병에게 얼마를 제안하시겠습니까?");
+        string input = Console.ReadLine();
+        if (int.TryParse(input, out int offeredGold))
+        {
+            if (offeredGold < 0)
+            {
+                return;
+            }
+
+            if (HaveMoney >= offeredGold)
+            {
+                HaveMoney -= offeredGold;
+                if (Mercenary == null)
+                {
+                    Mercenary = new Mercenary();
+                }
+                Mercenary.HireResponse(offeredGold); // 용병의 반응 출력
+            }
+
+        }
+        else
+        {
+            Console.WriteLine("잘못된 입력입니다.");
+        }
+    }
 }
 
 public class Warrior : Player
@@ -31,7 +61,8 @@ public class Warrior : Player
     public Warrior() : base("전사", 10, 100) { }
 
     public override void Attack(Monster monster)
-    {   if( monster == null)
+    {
+        if (monster == null)
         {
             return;
         }
@@ -143,6 +174,10 @@ public class Inventory
         }
         Console.WriteLine("====================");
     }
+
+
+
+
 }
 // 인벤 관려해서 아이템추가시 playerInventory.addItem("HP 포션", 3); 이렇게 하기! 
 // 아이템제거는 RemoveItem
