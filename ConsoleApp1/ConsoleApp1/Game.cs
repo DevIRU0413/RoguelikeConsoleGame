@@ -114,7 +114,7 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     PrintBattle(new Position(0, 1));
                     break;
-                
+
             }
         }
 
@@ -154,7 +154,7 @@ namespace RoguelikeConsoleGame
                 case ViewField.Battle:
                     InputBattle(inputKey);
                     break;
-                
+
             }
         }
         // 마지막 업데이트 (모든 처리의 마지막 후처리)
@@ -233,14 +233,14 @@ namespace RoguelikeConsoleGame
         private void PrintBattle(Position pos)
         {
             DrawMap(pos);
-            DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y-1));
+            DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y - 1));
             DrawLogs(new Position(44, pos.y));
 
             Console.WriteLine("\n행동을 선택하세요:");
             Console.WriteLine("1. 공격");
             Console.WriteLine("2. 도망가기");
         }
-       
+
 
         // ETC
         private void DrawMap(Position pos)
@@ -303,7 +303,7 @@ namespace RoguelikeConsoleGame
                 case ConsoleKey.D2:
                     viewField = ViewField.Field;
                     break;
-                
+
                 case ConsoleKey.D3:
                     isGameOver = true;
                     break;
@@ -362,7 +362,7 @@ namespace RoguelikeConsoleGame
                     break;
             }
         }
-        
+
 
         // ETC
         #endregion
@@ -385,7 +385,7 @@ namespace RoguelikeConsoleGame
             switch (battleAction)
             {
                 case BattleAction.Attack:
-                    if(monster==null)
+                    if (monster == null)
                     {
                         break;
                     }
@@ -433,7 +433,22 @@ namespace RoguelikeConsoleGame
 
             player.HaveMoney -= damage;
             battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
+
+            if (player.HaveMoney <= 0)
+            {
+                if (player.HasStone)
+                {
+                    player.HaveMoney += 100;
+                    player.HasStone = false;
+                    battleLoger.AddLog("알수 없는 힘에 의해 죽음을 면했습니다");
+                }
+                else
+                {
+                    battleLoger.AddLog("플레이어가 사망했습니다.");
+                    isGameOver = true;
+                }
+                #endregion
+            }
         }
-        #endregion
     }
 }

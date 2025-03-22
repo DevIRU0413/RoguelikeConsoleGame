@@ -19,12 +19,6 @@ namespace ConsoleApp1
 
         private void InitializeItems()
         {
-            items["HP 포션"] = (50, (player) =>
-            {
-                player.Inventory.AddItem("HP 포션");
-
-            }
-            );
 
             items["복권"] = (150, (player) =>
             {
@@ -37,15 +31,23 @@ namespace ConsoleApp1
             items["기회창출의 돌"] = (1000, (player) =>
             {
                 player.Inventory.AddItem("기회창출의 돌");
-                // 부활 로직 필요 
+                player.HasStone = true;
+                
             }
             );
 
             items["강화의 돌(1회 구매가능)"] = (500, (player) =>
-            {
-                player.AttackPower += 3;
-                
+            {   if (!player.usedStone)
+                {
+                    player.AttackPower += 3;
+                    player.usedStone = true;
+                }
+            else
+                {
+                    Console.WriteLine("강화의 돌은 한번만 구매가능합니다.");
+                }
             }
+           
             );
         }
 

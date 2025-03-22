@@ -8,6 +8,8 @@ public abstract class Player
     public int HaveMoney { get; set; }
     public Inventory Inventory { get; set; }
     public bool usedStone { get; set; }
+    
+    public bool HasStone { get; set; }
     protected Random random = new Random();
 
     protected Player(string job, int attackPower, int haveMoney)
@@ -18,6 +20,7 @@ public abstract class Player
         HaveMoney = haveMoney;
         Inventory = new Inventory();
         usedStone = false;
+        HasStone = false;
     }
 
     public abstract void Attack(Monster monster);
