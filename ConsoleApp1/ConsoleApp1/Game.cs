@@ -227,6 +227,8 @@ namespace RoguelikeConsoleGame
         {
             Console.SetCursorPosition(pos.x, pos.y);
             Console.WriteLine("===== 필드 =====");
+
+            DrawMap(new Position(0, 2));
             Console.WriteLine("1. 몬스터와 싸우기");
             Console.WriteLine("2. 도망가기");
             Console.WriteLine("3. 로비로 돌아가기");
@@ -401,13 +403,17 @@ namespace RoguelikeConsoleGame
             }
 
             Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HP}, 공격력: {player.AttackPower}");
-            viewField = ViewField.Lobby;
+            viewField = ViewField.Field;
         }
         private void ProcessBattle()
         {
             switch (battleAction)
             {
                 case BattleAction.Attack:
+                    if(monster==null)
+                    {
+                        break;
+                    }
                     player.Attack(monster);
 
                     if (monster.HP > 0)

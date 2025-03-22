@@ -28,7 +28,10 @@ public class Warrior : Player
     public Warrior() : base("전사", 100, 10, 10) { }
 
     public override void Attack(Monster monster)
-    {
+    {   if( monster == null)
+        {
+            return;
+        }
         monster.HP -= AttackPower;
         Console.WriteLine($"{Job}가 {monster.Name}에게 {AttackPower}의 피해를 입혔습니다!");
     }
