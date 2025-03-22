@@ -3,17 +3,17 @@
 public abstract class Player
 {
     public string Job { get; }
-    public int HP { get; set; }
+    
     public int AttackPower { get; set; }
     public int HaveMoney { get; set; }
     public Inventory Inventory { get; set; }
     public bool usedStone { get; set; }
     protected Random random = new Random();
 
-    protected Player(string job, int hp, int attackPower, int haveMoney)
+    protected Player(string job, int attackPower, int haveMoney)
     {
         Job = job;
-        HP = hp;
+        
         AttackPower = attackPower;
         HaveMoney = haveMoney;
         Inventory = new Inventory();
@@ -25,7 +25,7 @@ public abstract class Player
 
 public class Warrior : Player
 {
-    public Warrior() : base("전사", 100, 10, 10) { }
+    public Warrior() : base("전사", 10, 100) { }
 
     public override void Attack(Monster monster)
     {   if( monster == null)
@@ -45,7 +45,7 @@ public class Warrior : Player
 
 public class Mage : Player
 {
-    public Mage() : base("마법사", 50, 15, 10) { }
+    public Mage() : base("마법사", 15, 50) { }
 
     public override void Attack(Monster monster)
     {
@@ -55,7 +55,7 @@ public class Mage : Player
 }
 public class Archer : Player
 {
-    public Archer() : base("궁수", 75, 15, 10) { }
+    public Archer() : base("궁수", 15, 75) { }
 
     public override void Attack(Monster monster)
     {
@@ -74,7 +74,7 @@ public class Archer : Player
 
 public class Rogue : Player
 {
-    public Rogue() : base("도적", 75, 12, 10) { }
+    public Rogue() : base("도적", 12, 75) { }
 
     public override void Attack(Monster monster)
     {
