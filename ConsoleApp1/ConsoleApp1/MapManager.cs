@@ -35,7 +35,12 @@ public class MapManager
     }
     public bool IsPosMovable(Position pos)
     {
-        return TileInfos[MapTiles[pos.y, pos.x]].tileMovable;
+        return GetTileInfo(pos).tileMovable;
+    }
+
+    public TileInfo GetTileInfo(Position pos)
+    {
+        return TileInfos[MapTiles[pos.y, pos.x]];
     }
 
     // 맵 특수문자 출력(그림용)
