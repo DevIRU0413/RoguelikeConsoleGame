@@ -104,9 +104,6 @@ namespace RoguelikeConsoleGame
                 case ViewField.SelectJob:
                     PrintSelectJob(new Position(0, 0));
                     break;
-                case ViewField.Lobby:
-                    PrintLobby(new Position(0, 0));
-                    break;
                 case ViewField.Town:
                     PrintTown(new Position(0, 0));
                     break;
@@ -141,9 +138,6 @@ namespace RoguelikeConsoleGame
                     break;
                 case ViewField.SelectJob:
                     InputSelectJob(inputKey);
-                    break;
-                case ViewField.Lobby:
-                    InputLobby(inputKey);
                     break;
                 case ViewField.Town:
                     InputTown(inputKey);
@@ -365,7 +359,7 @@ namespace RoguelikeConsoleGame
             }
 
             Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HaveMoney}, 공격력: {player.AttackPower}");
-            viewField = ViewField.Lobby;
+            viewField = ViewField.Field;
             player.SetPosition(new Position(10, 10));
         }
         private void ProcessBattle()
