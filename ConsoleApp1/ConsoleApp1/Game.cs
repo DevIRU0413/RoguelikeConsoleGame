@@ -82,7 +82,7 @@ namespace RoguelikeConsoleGame
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 7
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
-                        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 2, }, // 1
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                         { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
@@ -130,6 +130,7 @@ namespace RoguelikeConsoleGame
             TileInfo potal = new TileInfo((int)Tile.Potal, '@', ConsoleColor.Blue, true);
             TileInfo item = new TileInfo((int)Tile.Item, 'i', ConsoleColor.Yellow, true);
             TileInfo monster = new TileInfo((int)Tile.Monster, 'm', ConsoleColor.DarkRed, true);
+            TileInfo casino = new TileInfo((int)Tile.Casino, 'C', ConsoleColor.Gray, true);
             TileInfo[] tiles = new TileInfo[]
             {
                 errorTile,
@@ -138,6 +139,7 @@ namespace RoguelikeConsoleGame
                 potal,
                 item,
                 monster,
+                casino
             };
 
             MapManager.Singleton.Init(tiles, mapNums, 1);
@@ -473,6 +475,11 @@ namespace RoguelikeConsoleGame
                     monster = Monster.GenerateMonster(wyvernKillCount);
                     viewField = ViewField.Battle;
                     battleLogger.Clear();
+                    break;
+                case Tile.Casino:
+                    fieldLogger.AddLog("카지노");
+                    HorseRaceGame horseRaceGame = new HorseRaceGame();
+                    horseRaceGame.StartRace();
                     break;
                 default:
                     Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");

@@ -21,6 +21,7 @@ namespace Enums
         Potal, // 포탈 o E
         Item, // 아이템 o E
         Monster, // 몬스터 o E
+        Casino,
         End,
     }
 
