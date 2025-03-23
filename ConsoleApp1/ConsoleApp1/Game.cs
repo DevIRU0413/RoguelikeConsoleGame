@@ -291,22 +291,6 @@ namespace RoguelikeConsoleGame
                     break;
             }
         }
-        private void InputLobby(ConsoleKey inputKey)
-        {
-            switch (inputKey)
-            {
-                case ConsoleKey.D1:
-                    viewField = ViewField.Town;
-                    break;
-                case ConsoleKey.D2:
-                    viewField = ViewField.Field;
-                    break;
-
-                case ConsoleKey.D3:
-                    isGameOver = true;
-                    break;
-            }
-        }
         private void InputTown(ConsoleKey inputKey)
         {
             switch (inputKey)
@@ -325,6 +309,9 @@ namespace RoguelikeConsoleGame
         }
         private void InputField(ConsoleKey inputKey)
         {
+            // 이동 키
+            Move(inputKey);
+            // 다른 키 눌렀을 때
             switch (inputKey)
             {
                 case ConsoleKey.D1:
@@ -337,7 +324,7 @@ namespace RoguelikeConsoleGame
                     break;
                 case ConsoleKey.D2:
                     Console.WriteLine("플레이어가 도망쳤습니다!");
-                    viewField = ViewField.Lobby;
+                    viewField = ViewField.Field;
                     break;
                 case ConsoleKey.D3:
                     viewField = ViewField.Lobby;
