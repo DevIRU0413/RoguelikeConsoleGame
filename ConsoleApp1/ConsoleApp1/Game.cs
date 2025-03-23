@@ -142,7 +142,7 @@ namespace RoguelikeConsoleGame
             };
 
             MapManager.Singleton.Init(tiles, mapNums);
-            battleLoger = new Logger(19);
+            battleLogger = new Logger(19);
             shop = new Shop();
            
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
