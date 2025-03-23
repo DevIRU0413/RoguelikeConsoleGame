@@ -88,11 +88,14 @@ public class MapManager
             Console.WriteLine();
         }
     }
+
     public void DrawMapTile(Position pos)
     {
         DrawMapTile(this.step, pos);
     }
+
     // 맵 번호 출력(디버그용)
+
     public void PrintMapTileNum(int step, Position pos)
     {
         Console.SetCursorPosition(pos.x, pos.y);
@@ -112,5 +115,16 @@ public class MapManager
     {
         PrintMapTileNum(this.step, pos);
     }
-
+    // 층수변경
+    public void ChangeFloor(int newFloor)
+    {
+        if(floorMaps.ContainsKey(newFloor))
+        {
+            this.step = newFloor;
+        }
+        else
+        {
+            Console.WriteLine("오류");
+        }
+    }
 }
