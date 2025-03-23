@@ -113,10 +113,6 @@ namespace RoguelikeConsoleGame
                 case ViewField.Field:
                     PrintField(new Position(0, 0));
                     break;
-                case ViewField.Battle:
-                    PrintBattle(new Position(0, 1));
-                    break;
-
             }
         }
 
@@ -155,10 +151,6 @@ namespace RoguelikeConsoleGame
                 case ViewField.Field:
                     InputField(inputKey);
                     break;
-                case ViewField.Battle:
-                    InputBattle(inputKey);
-                    break;
-
             }
         }
         // 마지막 업데이트 (모든 처리의 마지막 후처리)
@@ -175,8 +167,6 @@ namespace RoguelikeConsoleGame
                 case ViewField.Lobby:
                     break;
                 case ViewField.Field:
-                    break;
-                case ViewField.Battle:
                     ProcessBattle();
                     break;
                 //마을에 들어갈때 와이번 킬카운트 초기화
@@ -208,15 +198,6 @@ namespace RoguelikeConsoleGame
             Console.SetCursorPosition(pos.x, pos.y);
             Console.WriteLine("직업을 선택하세요: 1. 전사, 2. 마법사, 3. 도적, 4. 궁수");
         }
-        private void PrintLobby(Position pos)
-        {
-            Console.SetCursorPosition(pos.x, pos.y);
-            Console.WriteLine("===== 로비 =====");
-            Console.WriteLine("1. 마을로 이동");
-            Console.WriteLine("2. 필드로 이동");
-            Console.WriteLine("3. 게임 종료");
-            Console.Write("메뉴를 선택하세요: ");
-        }
         private void PrintTown(Position pos)
         {
             Console.SetCursorPosition(pos.x, pos.y);
@@ -231,23 +212,19 @@ namespace RoguelikeConsoleGame
             Console.SetCursorPosition(pos.x, pos.y);
             Console.WriteLine("===== 필드 =====");
 
-            DrawMap(new Position(0, 2));
+            DrawMap(pos);
+            DrawPlayerPos(player.Position);
+            DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y));
+            battleLoger.DrawLoger(new Position(44, pos.y));
+
+            // DrawPlayerInfo(new Position(44, 0));
+            // DrawKeyInfo(new Position(44, 3));
+            // battleLoger.DrawLoger(new Position(66, pos.y));
             Console.WriteLine("1. 몬스터와 싸우기");
             Console.WriteLine("2. 도망가기");
             Console.WriteLine("3. 로비로 돌아가기");
             Console.Write("메뉴를 선택하세요: ");
         }
-        private void PrintBattle(Position pos)
-        {
-            DrawMap(pos);
-            DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y - 1));
-            DrawLogs(new Position(44, pos.y));
-
-            Console.WriteLine("\n행동을 선택하세요:");
-            Console.WriteLine("1. 공격");
-            Console.WriteLine("2. 도망가기");
-        }
-
 
         // ETC
         private void DrawMap(Position pos)
@@ -257,11 +234,31 @@ namespace RoguelikeConsoleGame
         private void DrawPlayerInfo(Position pos)
         {
             Console.SetCursorPosition(pos.x, pos.y);
-            Console.WriteLine($"PlayerGold: {player.HaveMoney}");
+            Console.WriteLine("*=====Status=======*");
+            Console.SetCursorPosition(pos.x, pos.y + 1);
+            Console.WriteLine($"*Gold: {player.HaveMoney} / ATK: {player.AttackPower}");
+            Console.SetCursorPosition(pos.x, pos.y + 2);
+            Console.WriteLine("*==================*");
         }
-        private void DrawLogs(Position pos)
+        private void DrawPlayerPos(Position pos)
         {
-            battleLoger.DrawLoger(pos);
+            Console.SetCursorPosition(player.Position.x * 2, player.Position.y);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($" ▼");
+            Console.ResetColor();
+        }
+        private void DrawKeyInfo(Position pos)
+        {
+            Console.SetCursorPosition(pos.x, pos.y);
+            Console.WriteLine("*==================*");
+            Console.SetCursorPosition(pos.x, pos.y + 1);
+            Console.WriteLine("*【이동 】[W.A.S.D]*");
+            Console.SetCursorPosition(pos.x, pos.y + 2);
+            Console.WriteLine("*【인벤토리 】[I]  *");
+            Console.SetCursorPosition(pos.x, pos.y + 3);
+            Console.WriteLine("*【능력치 】[J]    *");
+            Console.SetCursorPosition(pos.x, pos.y + 4);
+            Console.WriteLine("*==================*");
         }
         #endregion
 
@@ -353,21 +350,6 @@ namespace RoguelikeConsoleGame
                     break;
             }
         }
-        private void InputBattle(ConsoleKey inputKey)
-        {
-            switch (inputKey)
-            {
-                case ConsoleKey.D1:
-                    battleAction = BattleAction.Attack;
-                    break;
-                case ConsoleKey.D2:
-                    battleAction = BattleAction.RunAway;
-                    break;
-                default:
-                    battleAction = BattleAction.None;
-                    break;
-            }
-        }
 
         // ETC
         #endregion
@@ -384,6 +366,7 @@ namespace RoguelikeConsoleGame
 
             Console.WriteLine($"선택한 직업: {player.Job}, HP: {player.HaveMoney}, 공격력: {player.AttackPower}");
             viewField = ViewField.Lobby;
+            player.SetPosition(new Position(10, 10));
         }
         private void ProcessBattle()
         {
@@ -439,6 +422,84 @@ namespace RoguelikeConsoleGame
         }
 
         // ETC
+        private void InGameUpdate()
+        {
+            int currentTileNum = MapManager.Singleton.MapTiles[player.Position.y, player.Position.x];
+            // 현재 위치의 타일 검색
+            TileInfo currenTileInfo = MapManager.Singleton.TileInfos[currentTileNum];
+
+            if (player.Position.y == player.BeforePosition.y && player.Position.x == player.BeforePosition.x)
+                return;
+            else
+                battleLoger.AddLog($"[MOVE] [x {player.BeforePosition.x}, y {player.BeforePosition.y}] > [x {player.Position.x}, y {player.Position.y}]");
+
+            // 검색된 타일을 가지고 처리
+            if (currenTileInfo.tileID == 3) // 포탈
+            {
+                battleLoger.AddLog("!!!!!!!!!! = Potal = !!!!!!!!");
+            }
+            else if (currenTileInfo.tileID == 4) // 아이템
+            {
+                battleLoger.AddLog("!!!!!!!!!! = ITEM = !!!!!!!!");
+
+            }
+            else if (currenTileInfo.tileID == 5) // 몬스터
+            {
+                battleLoger.AddLog("!!!!!!!!!! = MONSTER = !!!!!!!!");
+            }
+            else if (currenTileInfo.tileID == 0)
+            {
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+            }
+        }
+        private void Move(ConsoleKey key)
+        {
+            Position direction = new Position();
+            Position movePos = new Position();
+
+            switch (key)
+            {
+                // 왼
+                case ConsoleKey.A:
+                case ConsoleKey.LeftArrow:
+                    direction.x--;
+                    break;
+                // 위
+                case ConsoleKey.W:
+                case ConsoleKey.UpArrow:
+                    direction.y--;
+                    break;
+                // 오
+                case ConsoleKey.D:
+                case ConsoleKey.RightArrow:
+                    direction.x++;
+                    break;
+                // 아래
+                case ConsoleKey.S:
+                case ConsoleKey.DownArrow:
+                    direction.y++;
+                    break;
+                default:
+                    return;
+            }
+
+            movePos.y = player.Position.y + direction.y;
+            movePos.x = player.Position.x + direction.x;
+
+            // 위치 음수 값 처리
+            // 위치 최대 값 처리
+            // 위치 불가 처리
+            if (!MapManager.Singleton.IsInMap(movePos) || !MapManager.Singleton.IsPosMovable(movePos))
+                player.SetPosition(player.Position);
+            else
+                player.SetPosition(movePos);
+        }
         private void MonsterAttack()
         {
             int damage = new Random().Next(monster.AttackPower - 5, monster.AttackPower + 5);
@@ -466,8 +527,8 @@ namespace RoguelikeConsoleGame
                     battleLoger.AddLog("플레이어가 사망했습니다.");
                     isGameOver = true;
                 }
-                #endregion
             }
         }
+        #endregion
     }
 }

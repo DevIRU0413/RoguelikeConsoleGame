@@ -1,4 +1,6 @@
-﻿namespace Structs
+﻿using System.Numerics;
+
+namespace Structs
 {
     public struct Position
     {
@@ -9,6 +11,14 @@
         {
             this.x = x;
             this.y = y;
+        }
+        public static Position operator +(Position lhs, Position rhs)
+        {
+            Position nv = new Position();
+            nv.x = lhs.x + rhs.x;
+            nv.y = lhs.y + rhs.y;
+
+            return nv;
         }
     }
 

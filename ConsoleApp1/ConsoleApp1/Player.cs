@@ -1,4 +1,6 @@
-﻿namespace RoguelikeConsoleGame;
+﻿using Structs;
+
+namespace RoguelikeConsoleGame;
 
 public abstract class Player
 {
@@ -6,6 +8,11 @@ public abstract class Player
 
     public int AttackPower { get; set; }
     public int HaveMoney { get; set; }
+
+    public Position Position { get; private set; }
+    public Position BeforePosition { get; private set; }
+
+
     public Inventory Inventory { get; set; }
     public bool usedStone { get; set; }
 
@@ -26,6 +33,12 @@ public abstract class Player
     }
 
     public abstract void Attack(Monster monster);
+
+    public void SetPosition(Position pos)
+    {
+        BeforePosition = Position;
+        Position = pos;
+    }
 
     public void HireMercenary()
     {
