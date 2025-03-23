@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoguelikeConsoleGame;
+using System;
 using System.Linq;
 using System.Threading;
 
@@ -8,12 +9,19 @@ namespace ConsoleApp1
     
     public class HorseRaceGame
     {
+        private Player player;
+
+        public HorseRaceGame(Player player)
+        {
+            this.player = player;
+        }
         public void StartRace()
         {
             string[] horses = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
             int[] positions = new int[horses.Length];
             Random random = new Random();
             bool raceFinished = false;
+            bool LOD = false;
 
             Console.Clear();
             Console.WriteLine("경마장에 온걸 환영한다.");
@@ -27,6 +35,9 @@ namespace ConsoleApp1
                 if (int.TryParse(Console.ReadLine(), out playerBet) && playerBet >= 1 && playerBet <= 10)
                 {
                     Console.WriteLine($"{playerBet}번 말({horses[playerBet - 1]})에 배팅하였다\n");
+
+                    // 배팅금액 차감
+                    player.HaveMoney -= 10;
                 }
                 else
                 {
@@ -58,6 +69,8 @@ namespace ConsoleApp1
                         if (i + 1 == playerBet)
                         {
                             Console.WriteLine("축하 한다 돈은 여기있다.");
+                            player.HaveMoney += 80;
+                            LOD = true;
                         }
                         else
                         {
@@ -69,8 +82,15 @@ namespace ConsoleApp1
 
                 Thread.Sleep(500); // 실시간 업데이트를 위해 대기
             }
-
-            Console.WriteLine("\n내일도 경마는 열리니 찾아와! ");
+            if (player.HaveMoney <= 0 && !LOD)
+            {
+                Console.WriteLine("돈도 없는게 운까지없네?");
+            }
+            else
+            {
+                Console.WriteLine("\n내일도 경마는 열리니 찾아와! ");
+            }
+                
         }
 
         private void DrawTrack(string[] horses, int[] positions)

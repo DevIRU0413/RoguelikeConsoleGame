@@ -133,13 +133,13 @@ namespace RoguelikeConsoleGame
             TileInfo casino = new TileInfo((int)Tile.Casino, 'C', ConsoleColor.Gray, true);
             TileInfo[] tiles = new TileInfo[]
             {
-                errorTile,
-                floor,
-                wall,
-                potal,
-                item,
-                monster,
-                casino
+                errorTile,  
+                floor,      
+                wall,      
+                potal,     
+                item,     
+                monster,   
+                casino      
             };
 
             MapManager.Singleton.Init(tiles, mapNums, 1);
@@ -478,8 +478,12 @@ namespace RoguelikeConsoleGame
                     break;
                 case Tile.Casino:
                     fieldLogger.AddLog("카지노");
-                    HorseRaceGame horseRaceGame = new HorseRaceGame();
+                    HorseRaceGame horseRaceGame = new HorseRaceGame(player);
                     horseRaceGame.StartRace();
+                    if(player.HaveMoney<=0)
+                    {
+                        isGameOver = true;
+                    }
                     break;
                 default:
                     Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
