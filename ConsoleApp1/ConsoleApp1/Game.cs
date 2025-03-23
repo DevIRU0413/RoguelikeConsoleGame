@@ -8,7 +8,8 @@ namespace RoguelikeConsoleGame
     {
         private ViewField viewField = ViewField.Title;
         private bool isGameOver = false;
-        private Logger battleLoger = null;
+        private Logger fieldLogger = null;
+        private Logger battleLogger = null;
 
         private Player player;
         private Monster monster;
@@ -206,6 +207,9 @@ namespace RoguelikeConsoleGame
                 case ViewField.Field:
                     InputField(inputKey);
                     break;
+                case ViewField.Battle:
+                    InputBattle(inputKey);
+                    break;
             }
         }
         // 마지막 업데이트 (모든 처리의 마지막 후처리)
@@ -222,6 +226,9 @@ namespace RoguelikeConsoleGame
                 case ViewField.Lobby:
                     break;
                 case ViewField.Field:
+                    ProcessField();
+                    break;
+                case ViewField.Battle:
                     ProcessBattle();
                     break;
                 //마을에 들어갈때 와이번 킬카운트 초기화
@@ -270,15 +277,27 @@ namespace RoguelikeConsoleGame
             DrawMap(pos);
             DrawPlayerPos(player.Position);
             DrawPlayerInfo(new Position(Console.WindowWidth - 20, pos.y));
-            battleLoger.DrawLoger(new Position(44, pos.y));
+            fieldLogger.DrawLoger(new Position(44, pos.y));
 
             // DrawPlayerInfo(new Position(44, 0));
             // DrawKeyInfo(new Position(44, 3));
             // battleLoger.DrawLoger(new Position(66, pos.y));
-            Console.WriteLine("1. 몬스터와 싸우기");
-            Console.WriteLine("2. 도망가기");
-            Console.WriteLine("3. 로비로 돌아가기");
-            Console.Write("메뉴를 선택하세요: ");
+        }
+        private void PrintBattle(Position pos)
+        {
+            Console.SetCursorPosition(pos.x, pos.y);
+            Console.WriteLine("*============= < 배틀 > =============*");
+            battleLogger.DrawLoger(pos + new Position(0, 1));
+
+            pos += new Position(0, 23);
+            Console.SetCursorPosition(pos.x, pos.y);
+            Console.WriteLine("*==================*");
+            Console.SetCursorPosition(pos.x, pos.y + 1);
+            Console.WriteLine("*【공격하기 】[1] *");
+            Console.SetCursorPosition(pos.x, pos.y + 2);
+            Console.WriteLine("*【도망가기 】[2] *");
+            Console.SetCursorPosition(pos.x, pos.y + 3);
+            Console.WriteLine("*==================*");
         }
 
         // ETC
@@ -372,27 +391,24 @@ namespace RoguelikeConsoleGame
         {
             // 이동 키
             Move(inputKey);
-            // 다른 키 눌렀을 때
+        }
+        private void InputBattle(ConsoleKey inputKey)
+        {
             switch (inputKey)
             {
+                // 공격
                 case ConsoleKey.D1:
-                    if (monster == null || monster.HP <= 0)
-                    {
-                        monster = Monster.GenerateMonster(wyvernKillCount);
-                        viewField = ViewField.Battle;
-                        battleAction = BattleAction.None;
-                    }
+                    battleAction = BattleAction.Attack;
                     break;
+                // 도망
                 case ConsoleKey.D2:
-                    Console.WriteLine("플레이어가 도망쳤습니다!");
-                    viewField = ViewField.Field;
+                    battleAction = BattleAction.RunAway;
                     break;
-                case ConsoleKey.D3:
-                    viewField = ViewField.Lobby;
+                default:
+                    battleAction = BattleAction.None;
                     break;
             }
         }
-
         // ETC
         #endregion
 
@@ -410,103 +426,102 @@ namespace RoguelikeConsoleGame
             viewField = ViewField.Field;
             player.SetPosition(new Position(10, 10));
         }
+        private void ProcessField()
+        {
+            int currentTileNum = MapManager.Singleton.GetTileInfo(player.Position).tileID;
+            Tile currentPosTile = (Tile)currentTileNum;
+
+            // 위치가 이전 위치와 같다면 냅둠.
+            if (player.Position.y == player.BeforePosition.y
+                && player.Position.x == player.BeforePosition.x)
+                return;
+            // 다른면 위치 출력
+            else
+                fieldLogger.AddLog($"[MOVE] [x {player.BeforePosition.x}, y {player.BeforePosition.y}] " +
+                    $"> [x {player.Position.x}, y {player.Position.y}]");
+
+
+            switch (currentPosTile)
+            {
+                case Tile.Floor:
+
+                    break;
+                case Tile.Potal:
+                    fieldLogger.AddLog("!!!!!!!!!! = Potal = !!!!!!!!");
+
+                    break;
+                case Tile.Item:
+                    fieldLogger.AddLog("!!!!!!!!!! = ITEM = !!!!!!!!");
+
+                    break;
+                case Tile.Monster:
+                    fieldLogger.AddLog("!!!!!!!!!! = MONSTER = !!!!!!!!");
+                    monster = Monster.GenerateMonster(wyvernKillCount);
+                    viewField = ViewField.Battle;
+                    break;
+                default:
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
+                    break;
+            }
+        }
+
         private void ProcessBattle()
         {
             switch (battleAction)
             {
                 case BattleAction.Attack:
-                    if (monster == null)
-                    {
-                        break;
-                    }
+                    if (monster == null) break;
+
+                    // 플레이어 공격
                     player.Attack(monster);
 
+                    // 플레이어 공격후, 몬스터 생존 시
                     if (monster.HP > 0)
                     {
                         MonsterAttack();
                     }
+                    // 플레이어 공격후, 몬스터 처치 시
                     else
                     {
-                        battleLoger.AddLog($"{monster.Name}을(를) 처치했습니다!");
+                        fieldLogger.AddLog($"{monster.Name}을(를) 처치했습니다!");
                         if (monster.Name == "와이번")
                         {
                             wyvernKillCount++;
                             if (wyvernKillCount == 3)
                             {
-                                battleLoger.AddLog("음산한 기운이 감싸든다");
+                                fieldLogger.AddLog("음산한 기운이 감싸든다");
                             }
                             else if (wyvernKillCount == 4)
                             {
-                                battleLoger.AddLog("싸늘한 기운이 감싸온다.");
+                                fieldLogger.AddLog("싸늘한 기운이 감싸온다.");
                             }
                             else if (wyvernKillCount == 5)
                             {
-                                battleLoger.AddLog("멀리서 표효 소리가 들려온다.");
+                                fieldLogger.AddLog("멀리서 표효 소리가 들려온다.");
                             }
                         }
                         monster = null;
                     }
                     break;
                 case BattleAction.RunAway:
-                    Console.WriteLine("플레이어가 도망쳤습니다!");
-                    viewField = ViewField.Lobby;
-                    break;
-                default:
-                    Console.WriteLine("잘못된 입력입니다.");
+                    fieldLogger.AddLog("플레이어가 도망쳤습니다!");
+                    viewField = ViewField.Field;
                     break;
             }
-
             if (player.HaveMoney <= 0)
             {
-                battleLoger.AddLog("플레이어가 사망했습니다. 게임 오버!");
+                fieldLogger.AddLog("플레이어가 사망했습니다. 게임 오버!");
                 isGameOver = true;
             }
         }
 
         // ETC
-        private void InGameUpdate()
-        {
-            int currentTileNum = MapManager.Singleton.MapTiles[player.Position.y, player.Position.x];
-            // 현재 위치의 타일 검색
-            TileInfo currenTileInfo = MapManager.Singleton.TileInfos[currentTileNum];
-
-            if (currenTileInfo.tileID == (int)Tile.Potal)
-            {
-                int newFloor = player.Position.floor == 1 ? 2 : (player.Position.floor == 2 ? 3 : 1);
-                MapManager.Singleton.ChangeFloor(player.Position, newFloor);
-                battleLoger.AddLog($"현재 {newFloor}에 도착하였습니다.");
-            }
-
-            if (player.Position.y == player.BeforePosition.y && player.Position.x == player.BeforePosition.x)
-                return;
-            else
-                battleLoger.AddLog($"[MOVE] [x {player.BeforePosition.x}, y {player.BeforePosition.y}] > [x {player.Position.x}, y {player.Position.y}]");
-
-            // 검색된 타일을 가지고 처리
-            if (currenTileInfo.tileID == 3) // 포탈
-            {
-                battleLoger.AddLog("!!!!!!!!!! = Potal = !!!!!!!!");
-            }
-            else if (currenTileInfo.tileID == 4) // 아이템
-            {
-                battleLoger.AddLog("!!!!!!!!!! = ITEM = !!!!!!!!");
-
-            }
-            else if (currenTileInfo.tileID == 5) // 몬스터
-            {
-                battleLoger.AddLog("!!!!!!!!!! = MONSTER = !!!!!!!!");
-            }
-            else if (currenTileInfo.tileID == 0)
-            {
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-                Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
-            }
-        }
         private void Move(ConsoleKey key)
         {
             Position direction = new Position();
@@ -540,10 +555,10 @@ namespace RoguelikeConsoleGame
 
             movePos = player.Position + direction;
 
-            if (!MapManager.Singleton.IsInMap(movePos) && !MapManager.Singleton.IsPosMovable(movePos))
-            {
+            if (!MapManager.Singleton.IsInMap(movePos) || !MapManager.Singleton.IsPosMovable(movePos))
+                player.SetPosition(player.Position);
+            else
                 player.SetPosition(movePos);
-            }
         }
         private void MonsterAttack()
         {
@@ -552,12 +567,12 @@ namespace RoguelikeConsoleGame
             // 전사의 자동 방어 시스템 적용유무는 모르겠음 머쓱 
             if (player is Warrior warrior && warrior.BlockAttack())
             {
-                battleLoger.AddLog($"전사가 몬스터의 공격을 막았습니다!");
+                fieldLogger.AddLog($"전사가 몬스터의 공격을 막았습니다!");
                 return;
             }
 
             player.HaveMoney -= damage;
-            battleLoger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
+            fieldLogger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
 
             if (player.HaveMoney <= 0)
             {   // 기회창출의 돌 로직 
@@ -565,11 +580,11 @@ namespace RoguelikeConsoleGame
                 {
                     player.HaveMoney += 100;
                     player.HasStone = false;
-                    battleLoger.AddLog("알수 없는 힘에 의해 죽음을 면했습니다");
+                    fieldLogger.AddLog("알수 없는 힘에 의해 죽음을 면했습니다");
                 }
                 else
                 {
-                    battleLoger.AddLog("플레이어가 사망했습니다.");
+                    fieldLogger.AddLog("플레이어가 사망했습니다.");
                     isGameOver = true;
                 }
             }
