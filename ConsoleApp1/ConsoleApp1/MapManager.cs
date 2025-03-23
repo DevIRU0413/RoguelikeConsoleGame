@@ -1,6 +1,4 @@
-﻿using System;
-using Enums;
-using Structs;
+﻿using Structs;
 
 public class MapManager
 {
@@ -17,43 +15,65 @@ public class MapManager
     }
 
     private Dictionary<int, int[,]> floorMaps = new Dictionary<int, int[,]>();
-    
+    private int step = 0;
+
     // Tiles Data
     public TileInfo[] TileInfos { get; private set; }
 
-    // Tile num Array
-    public int[,] MapTiles { get; private set; }
-
-    public void Init(TileInfo[] tileInfos, Dictionary<int, int[,]> mapTileNums)
+    public void Init(TileInfo[] tileInfos, Dictionary<int, int[,]> mapTileNums, int step = 1)
     {
         TileInfos = tileInfos;
         floorMaps = mapTileNums;
+
+        // 존재 하지않은 층 넣어줬을 때
+        if (!floorMaps.ContainsKey(step))
+        {
+            foreach (int key in floorMaps.Keys)
+            {
+                step = key;
+                break;
+            }
+        }
+        // 넣어주기
+        this.step = step;
     }
 
+    public bool IsInMap(int step, Position pos)
+    {
+        if (!floorMaps.ContainsKey(step)) return false;
+        int[,] currentMap = floorMaps[step];
+        return (pos.x >= 0 && pos.y >= 0
+            && pos.x < currentMap.GetLength(1) && pos.y < currentMap.GetLength(0));
+    }
     public bool IsInMap(Position pos)
     {
-        if (!floorMaps.ContainsKey(pos.floor)) return false;
-        int[,] currentMap = floorMaps[pos.floor];
-        return (pos.x >= 0 && pos.y >= 0
-            && pos.x < MapTiles.GetLength(1) && pos.y < currentMap.GetLength(0));
+        return IsInMap(this.step, pos);
+    }
+    public bool IsPosMovable(int step, Position pos)
+    {
+        if (!floorMaps.ContainsKey(step)) return false;
+        int[,] currentMap = floorMaps[step];
+        return TileInfos[currentMap[pos.y, pos.x]].tileMovable;
     }
     public bool IsPosMovable(Position pos)
     {
-        if (!floorMaps.ContainsKey(pos.floor)) return false;
-        int[,] currentMap = floorMaps[pos.floor];
-        return TileInfos[currentMap[pos.y,pos.x]].tileMovable;
+        return IsPosMovable(this.step, pos);
     }
 
+    public TileInfo GetTileInfo(int step, Position pos)
+    {
+        return TileInfos[floorMaps[step][pos.y, pos.x]];
+    }
     public TileInfo GetTileInfo(Position pos)
     {
-        return TileInfos[MapTiles[pos.y, pos.x]];
+        return GetTileInfo(this.step, pos);
     }
 
     // 맵 특수문자 출력(그림용)
-    public void DrawMapTile(Position pos)
+    public void DrawMapTile(int step, Position pos)
     {
-        if (!floorMaps.ContainsKey(pos.floor)) return;
-        int[,] currentMap = floorMaps[pos.floor];
+        if (!floorMaps.ContainsKey(step)) return;
+        int[,] currentMap = floorMaps[step];
         Console.SetCursorPosition(pos.x, pos.y);
         for (int y = 0; y < currentMap.GetLength(0); y++)
         {
@@ -68,26 +88,29 @@ public class MapManager
             Console.WriteLine();
         }
     }
-
-    public void ChangeFloor(Position pos, int newFloor)
+    public void DrawMapTile(Position pos)
     {
-        if (floorMaps.ContainsKey(newFloor))
-        {
-            pos.floor = newFloor;
-        }
+        DrawMapTile(this.step, pos);
     }
     // 맵 번호 출력(디버그용)
-    public void PrintMapTileNum(Position pos)
+    public void PrintMapTileNum(int step, Position pos)
     {
         Console.SetCursorPosition(pos.x, pos.y);
-        for (int y = 0; y < MapTiles.GetLength(0); y++)
+        int[,] currentMap = floorMaps[step];
+        Console.SetCursorPosition(pos.x, pos.y);
+        for (int y = 0; y < currentMap.GetLength(0); y++)
         {
-            for (int x = 0; x < MapTiles.GetLength(1); x++)
+            for (int x = 0; x < currentMap.GetLength(1); x++)
             {
-                int tileNum = MapTiles[y,x];
+                int tileNum = currentMap[y,x];
                 Console.Write($" {tileNum}");
             }
             Console.WriteLine();
         }
     }
+    public void PrintMapTileNum(Position pos)
+    {
+        PrintMapTileNum(this.step, pos);
+    }
+
 }

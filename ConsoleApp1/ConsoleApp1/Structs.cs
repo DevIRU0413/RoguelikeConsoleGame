@@ -6,22 +6,18 @@ namespace Structs
     {
         public int x;
         public int y;
-        public int floor;
 
         public Position(int x, int y)
         {
             this.x = x;
             this.y = y;
-            this.floor = 1;
         }
         public static Position operator +(Position lhs, Position rhs)
         {
             Position nv = new Position();
             nv.x = lhs.x + rhs.x;
             nv.y = lhs.y + rhs.y;
-
             return nv;
-            
         }
     }
 

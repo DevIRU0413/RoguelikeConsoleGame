@@ -60,7 +60,7 @@ namespace RoguelikeConsoleGame
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
-                    { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
+                    { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                     { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
@@ -125,7 +125,7 @@ namespace RoguelikeConsoleGame
 
 
 
-        TileInfo errorTile = new TileInfo((int)Tile.Floor, 'ⓧ', ConsoleColor.Red, false);
+            TileInfo errorTile = new TileInfo((int)Tile.Floor, 'ⓧ', ConsoleColor.Red, false);
             TileInfo floor = new TileInfo((int)Tile.Floor, ' ', ConsoleColor.Black, true);
             TileInfo wall = new TileInfo((int)Tile.Wall, '▦', ConsoleColor.White, false);
             TileInfo potal = new TileInfo((int)Tile.Potal, '@', ConsoleColor.Blue, true);
@@ -141,10 +141,11 @@ namespace RoguelikeConsoleGame
                 monster,
             };
 
-            MapManager.Singleton.Init(tiles, mapNums);
-            battleLogger = new Logger(19);
+            MapManager.Singleton.Init(tiles, mapNums, 1);
+            fieldLogger = new Logger(19);
+            battleLogger = new Logger(20);
             shop = new Shop();
-           
+
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
             // battleAction = BattleAction.None;
         }
@@ -171,6 +172,9 @@ namespace RoguelikeConsoleGame
                     break;
                 case ViewField.Field:
                     PrintField(new Position(0, 0));
+                    break;
+                case ViewField.Battle:
+                    PrintBattle(new Position(0, 0));
                     break;
             }
         }
