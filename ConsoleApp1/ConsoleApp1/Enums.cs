@@ -30,4 +30,13 @@ namespace Enums
         Attack, // 공격
         RunAway, // 도망
     }
+
+    public enum PlayerAttackType
+    {
+        None,
+        Miss,
+        Attack,
+        DoubleAttack,
+        CriticalAttack,
+    }
 }

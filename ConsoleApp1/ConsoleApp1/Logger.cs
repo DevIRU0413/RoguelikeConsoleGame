@@ -35,6 +35,7 @@ namespace ConsoleApp1
 
         public void Clear()
         {
+            count = 0;
             for (int i = 0; i < logs.Length; i++)
                 logs[i] = null;
         }
