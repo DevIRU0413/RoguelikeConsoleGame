@@ -38,7 +38,9 @@ namespace RoguelikeConsoleGame
         // 값 초기화 관련 처리
         private void Init()
         {
-            int[,] mapNum = new int[21, 21]
+            Dictionary<int, int[,]> mapNums = new Dictionary<int, int[,]>
+            {
+            {1, new int[21,21]
             {
                 //0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
                 { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, }, // 0
@@ -62,7 +64,10 @@ namespace RoguelikeConsoleGame
                 { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                 { 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, }, // 1
                 { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, }, // 0
-            };
+            }
+            }};
+
+            
 
             TileInfo errorTile = new TileInfo((int)Tile.Floor, 'ⓧ', ConsoleColor.Red, false);
             TileInfo floor = new TileInfo((int)Tile.Floor, ' ', ConsoleColor.Black, true);
@@ -80,9 +85,10 @@ namespace RoguelikeConsoleGame
                 monster,
             };
 
-            MapManager.Singleton.Init(tiles, mapNum);
+            MapManager.Singleton.Init(tiles, mapNums);
             battleLoger = new Logger(19);
             shop = new Shop();
+           
             // 플레이어 초기화 부분은 로비에서 직업 선택 시
             // battleAction = BattleAction.None;
         }
@@ -408,6 +414,13 @@ namespace RoguelikeConsoleGame
             int currentTileNum = MapManager.Singleton.MapTiles[player.Position.y, player.Position.x];
             // 현재 위치의 타일 검색
             TileInfo currenTileInfo = MapManager.Singleton.TileInfos[currentTileNum];
+
+            if (currenTileInfo.tileID == (int)Tile.Potal)
+            {
+                int newFloor = player.Position.floor == 1 ? 2 : (player.Position.floor == 2 ? 3 : 1);
+                MapManager.Singleton.ChangeFloor(player.Position, newFloor);
+                battleLoger.AddLog($"현재 {newFloor}에 도착하였습니다.");
+            }
 
             if (player.Position.y == player.BeforePosition.y && player.Position.x == player.BeforePosition.x)
                 return;

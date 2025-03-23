@@ -16,25 +16,31 @@ public class MapManager
         }
     }
 
+    private Dictionary<int, int[,]> floorMaps = new Dictionary<int, int[,]>();
+    
     // Tiles Data
     public TileInfo[] TileInfos { get; private set; }
 
     // Tile num Array
     public int[,] MapTiles { get; private set; }
 
-    public void Init(TileInfo[] tileInfos, int[,] mapTileNums)
+    public void Init(TileInfo[] tileInfos, Dictionary<int, int[,]> mapTileNums)
     {
         TileInfos = tileInfos;
-        MapTiles = mapTileNums;
+        floorMaps = mapTileNums;
     }
 
     public bool IsInMap(Position pos)
     {
+        if (!floorMaps.ContainsKey(pos.floor)) return false;
+        int[,] currentMap = floorMaps[pos.floor];
         return (pos.x >= 0 && pos.y >= 0
             && pos.x < MapTiles.GetLength(1) && pos.y < MapTiles.GetLength(0));
     }
     public bool IsPosMovable(Position pos)
     {
+        if (!floorMaps.ContainsKey(pos.floor)) return false;
+        int[,] currentMap = floorMaps[pos.floor];
         return GetTileInfo(pos).tileMovable;
     }
 
@@ -46,6 +52,8 @@ public class MapManager
     // 맵 특수문자 출력(그림용)
     public void DrawMapTile(Position pos)
     {
+        if (!floorMaps.ContainsKey(pos.floor)) return;
+        int[,] currentMap = floorMaps[pos.floor];
         Console.SetCursorPosition(pos.x, pos.y);
         for (int y = 0; y < MapTiles.GetLength(0); y++)
         {
@@ -58,6 +66,14 @@ public class MapManager
                 Console.ResetColor();
             }
             Console.WriteLine();
+        }
+    }
+
+    public void ChangeFloor(Position pos, int newFloor)
+    {
+        if (floorMaps.ContainsKey(newFloor))
+        {
+            pos.floor = newFloor;
         }
     }
     // 맵 번호 출력(디버그용)
