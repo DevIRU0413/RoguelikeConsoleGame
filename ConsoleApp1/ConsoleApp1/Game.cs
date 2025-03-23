@@ -454,7 +454,7 @@ namespace RoguelikeConsoleGame
 
                     int newFloor = player.Position.floor + 1;
 
-                    if(MapManager.Singleton.IsInMap(newFloor, player.Position))
+                    if (MapManager.Singleton.IsInMap(newFloor, player.Position))
                     {
                         player.SetPosition(new Position(player.Position.x, player.Position.y, newFloor));
                         MapManager.Singleton.ChangeFloor(newFloor);
@@ -464,7 +464,7 @@ namespace RoguelikeConsoleGame
                     {
                         fieldLogger.AddLog("오류");
                     }
-                        break;
+                    break;
                 case Tile.Item:
                     fieldLogger.AddLog("!!!!!!!!!! = ITEM = !!!!!!!!");
 
@@ -473,6 +473,7 @@ namespace RoguelikeConsoleGame
                     fieldLogger.AddLog("!!!!!!!!!! = MONSTER = !!!!!!!!");
                     monster = Monster.GenerateMonster(wyvernKillCount);
                     viewField = ViewField.Battle;
+                    battleLogger.Clear();
                     break;
                 default:
                     Console.WriteLine("!!!!!!!!!!ERROR!!!!!!!!");
@@ -485,44 +486,54 @@ namespace RoguelikeConsoleGame
                     break;
             }
         }
-
         private void ProcessBattle()
         {
+            bool monsterKill = false;
             switch (battleAction)
             {
                 case BattleAction.Attack:
-                    if (monster == null) break;
-
-                    // 플레이어 공격
-                    player.Attack(monster);
-
-                    // 플레이어 공격후, 몬스터 생존 시
+                    // 몬스터 생존 시
                     if (monster.HP > 0)
                     {
-                        MonsterAttack();
-                    }
-                    // 플레이어 공격후, 몬스터 처치 시
-                    else
-                    {
-                        fieldLogger.AddLog($"{monster.Name}을(를) 처치했습니다!");
-                        if (monster.Name == "와이번")
+                        // 직업에 따른 공격 타입 정하기
+                        PlayerAttackType attackType = player.Attack();
+                        // 공격 타입에 따른 데미지 산출
+                        int hitDamage = 0;
+                        bool isAttack = true;
+                        switch (attackType)
                         {
-                            wyvernKillCount++;
-                            if (wyvernKillCount == 3)
-                            {
-                                fieldLogger.AddLog("음산한 기운이 감싸든다");
-                            }
-                            else if (wyvernKillCount == 4)
-                            {
-                                fieldLogger.AddLog("싸늘한 기운이 감싸온다.");
-                            }
-                            else if (wyvernKillCount == 5)
-                            {
-                                fieldLogger.AddLog("멀리서 표효 소리가 들려온다.");
-                            }
+                            case PlayerAttackType.Miss:
+                                battleLogger.AddLog($"{player.Job}가 공격 실패!!");
+                                isAttack = false;
+                                break;
+                            case PlayerAttackType.Attack:
+                                hitDamage = player.AttackPower;
+                                battleLogger.AddLog($"{player.Job}가 공격 성공!!");
+                                break;
+                            case PlayerAttackType.DoubleAttack:
+                                hitDamage = player.AttackPower * 2;
+                                battleLogger.AddLog($"{player.Job}가 더블 공격 성공!!");
+                                break;
+                            case PlayerAttackType.CriticalAttack:
+                                hitDamage = (int)Math.Round(player.AttackPower * 1.2d);
+                                battleLogger.AddLog($"{player.Job}가 크리티컬 공격 성공!!");
+                                break;
                         }
+
                         monster = null;
                         viewField = ViewField.Field;
+
+
+                        // 공격 성공 시
+                        if (isAttack)
+                        {
+                            // 데미지 적용
+                            monster.HP -= hitDamage;
+                            // 데미지 결과 콘솔 입력
+                            battleLogger.AddLog($"{player.Job}가 {monster.Name}에게 {hitDamage}의 피해를 입혔습니다!");
+                        }
+                        monsterKill = (monster.HP <= 0);
+
                     }
                     break;
                 case BattleAction.RunAway:
@@ -530,10 +541,48 @@ namespace RoguelikeConsoleGame
                     viewField = ViewField.Field;
                     break;
             }
-            if (player.HaveMoney <= 0)
+
+            // 몬스터 잡았을 때.
+            if (monsterKill)
             {
-                fieldLogger.AddLog("플레이어가 사망했습니다. 게임 오버!");
-                isGameOver = true;
+                fieldLogger.AddLog($"{monster.Name}을(를) 처치했습니다!");
+                if (monster.Name == "와이번")
+                {
+                    wyvernKillCount++;
+                    if (wyvernKillCount == 3)
+                    {
+                        fieldLogger.AddLog("음산한 기운이 감싸든다");
+                    }
+                    else if (wyvernKillCount == 4)
+                    {
+                        fieldLogger.AddLog("싸늘한 기운이 감싸온다.");
+                    }
+                    else if (wyvernKillCount == 5)
+                    {
+                        fieldLogger.AddLog("멀리서 표효 소리가 들려온다.");
+                    }
+                }
+                monster = null;
+                viewField = ViewField.Field;
+            }
+            // 몬스터 살아있을 때
+            else
+            {
+                MonsterAttack();
+                if (player.HaveMoney <= 0)
+                {   // 기회창출의 돌 로직 
+                    if (player.HasStone)
+                    {
+                        player.HaveMoney += 100;
+                        player.HasStone = false;
+                        battleLogger.AddLog("알수 없는 힘에 의해 죽음을 면했습니다");
+                    }
+                    else
+                    {
+                        battleLogger.AddLog("플레이어가 사망했습니다.");
+                        isGameOver = true;
+                    }
+                }
             }
         }
 
@@ -583,27 +632,12 @@ namespace RoguelikeConsoleGame
             // 전사의 자동 방어 시스템 적용유무는 모르겠음 머쓱 
             if (player is Warrior warrior && warrior.BlockAttack())
             {
-                fieldLogger.AddLog($"전사가 몬스터의 공격을 막았습니다!");
+                battleLogger.AddLog($"전사가 몬스터의 공격을 막았습니다!");
                 return;
             }
 
             player.HaveMoney -= damage;
-            fieldLogger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 HP: {player.HaveMoney}");
-
-            if (player.HaveMoney <= 0)
-            {   // 기회창출의 돌 로직 
-                if (player.HasStone)
-                {
-                    player.HaveMoney += 100;
-                    player.HasStone = false;
-                    fieldLogger.AddLog("알수 없는 힘에 의해 죽음을 면했습니다");
-                }
-                else
-                {
-                    fieldLogger.AddLog("플레이어가 사망했습니다.");
-                    isGameOver = true;
-                }
-            }
+            battleLogger.AddLog($"{monster.Name}이(가) 플레이어에게 {damage}의 피해를 입혔습니다! 남은 Money: {player.HaveMoney}");
         }
         #endregion
     }
