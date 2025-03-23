@@ -12,7 +12,7 @@ namespace Structs
         {
             this.x = x;
             this.y = y;
-            this.floor = floor;
+            this.floor = 1;
         }
         public static Position operator +(Position lhs, Position rhs)
         {
